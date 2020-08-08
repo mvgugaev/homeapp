@@ -4,8 +4,8 @@ from .models import *
 
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(label='ID')
-    username = serializers.CharField()
-    email = serializers.CharField()
+    username = serializers.CharField(required=False)
+    email = serializers.CharField(required=False)
 
     class Meta:
         model = User

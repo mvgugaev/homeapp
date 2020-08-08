@@ -14,6 +14,18 @@ class TaskView(APIView):
         except Workflow.DoesNotExist:
             raise Http404
 
+
+    def get_workflow_user(self, id, workflow):
+        try:
+            user = User.objects.get(id=id)
+
+            if user not in workflow.users:
+                raise Http404
+
+            return user
+        except Workflow.DoesNotExist:
+            raise Http404
+
     def get(self, request, workflow_id=None):
         
         # Empty tasks queryset
@@ -31,3 +43,19 @@ class TaskView(APIView):
 
         serializer = TaskSerializer(tasks, many=True)
         return Response({"tasks": serializer.data})
+
+    def post(self, request):
+
+        task = request.data.get('task')
+
+        # Create an article from the above data
+        serializer = TaskSerializer(data=task, context={'request': request})
+
+        if serializer.is_valid(raise_exception=True):
+            task_saved = serializer.save()
+            # print(serializer.__dict__)
+            print(serializer.users)
+            task_saved.users.add(*serializer.users)
+            task_saved.save()
+
+        return Response({"success": "Task '{}' created successfully".format(task_saved.name)})

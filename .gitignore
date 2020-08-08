@@ -1,0 +1,6 @@
+production.py
+*.pyc
+__pycache__/
+migrations/
+/static
+
