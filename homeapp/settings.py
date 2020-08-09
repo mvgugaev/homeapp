@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'user.middleware.AuthRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'homeapp.urls'
@@ -59,7 +60,9 @@ ROOT_URLCONF = 'homeapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,4 +129,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static/'
+# STATIC_ROOT = '/home/maksim/projects/home/homeapp/static/'
+
+STATICFILES_DIRS = [
+    '/home/maksim/projects/home/homeapp/static/',
+]
+
+
+LOGIN_URL = '/user/login/'

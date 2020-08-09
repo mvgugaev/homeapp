@@ -1,12 +1,15 @@
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from .models import *
 from .serializers import *
 from workflow.models import Workflow
 
 class TaskView(APIView):
+
+    permission_classes = (IsAuthenticated,)
 
     def get_workflow(self, user, id):
         try:
@@ -47,14 +50,10 @@ class TaskView(APIView):
     def post(self, request):
 
         task = request.data.get('task')
-
-        # Create an article from the above data
         serializer = TaskSerializer(data=task, context={'request': request})
 
         if serializer.is_valid(raise_exception=True):
             task_saved = serializer.save()
-            # print(serializer.__dict__)
-            print(serializer.users)
             task_saved.users.add(*serializer.users)
             task_saved.save()
 
