@@ -6,69 +6,34 @@
 {% endblock %}
 
 {% block content %}
-    <form class="form-signin" id="login_form">
-      <h1 class="h3 mb-3 font-weight-normal text-center">Вход в систему</h1>
-      <label for="inputEmail" class="sr-only">Email address</label>
-      <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-      <label for="inputPassword" class="sr-only">Password</label>
-      <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
-      {% csrf_token %}
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
-    </form>
+    <div class="main-container fullscreen">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-7">
+              <div class="text-center">
+                <h1 class="h2">Добро пожаловать 👋</h1>
+                <p class="lead">Войдите в личный кабинет что бы продолжить</p>
+                <form id="login_form">
+                  <div class="form-group">
+                    <input class="form-control" type="email" name="email" placeholder="Email адрес" required>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" type="password" name="password" placeholder="Пароль" required>
+                  </div>
+                  {% csrf_token %}
+                  <div id="login_form_errors"></div>
+                  <button class="btn btn-lg btn-block btn-primary" role="button" type="submit">
+                    Войти
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 {% endblock %}
 
 {% block style %}
-    <style>
-        html, body {
-            height: 100%;
-        }
-
-        body {
-            display: -ms-flexbox;
-            display: -webkit-box;
-            display: flex;
-            -ms-flex-align: center;
-            -ms-flex-pack: center;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            justify-content: center;
-            padding-top: 40px;
-            padding-bottom: 40px;
-            background-color: #f5f5f5;
-        }
-
-        .form-signin {
-            width: 100%;
-            max-width: 330px;
-            padding: 15px;
-            margin: 0 auto;
-        }
-
-        .form-signin .form-control {
-            position: relative;
-            box-sizing: border-box;
-            height: auto;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .form-signin .form-control:focus {
-            z-index: 2;
-        }
-
-        .form-signin input[type="email"] {
-            margin-bottom: -1px;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-
-        .form-signin input[type="password"] {
-            margin-bottom: 10px;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-    </style>
 {% endblock %}
 
 {% block scripts %}

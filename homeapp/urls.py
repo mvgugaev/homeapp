@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.views.generic.base import RedirectView
 from django.urls import path, include
 
 
@@ -8,8 +9,9 @@ from django.urls import path, include
 # ..........
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='/workflows/')),
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
-    path('api/workflows/', include('workflow.urls')),
-    path('api/tasks/', include('tasks.urls')),
+    path('workflows/', include('workflow.urls')),
+    path('tasks/', include('tasks.urls')),
 ]

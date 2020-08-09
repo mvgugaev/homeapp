@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from .errors import *
 from .models import *
 
 class UserSerializer(serializers.Serializer):
@@ -25,21 +26,15 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password', None)
 
         if email is None:
-            raise serializers.ValidationError(
-                'An email address is required to log in.'
-            )
+            raise serializers.ValidationError(EMPTY_EMAIL)
 
         if password is None:
-            raise serializers.ValidationError(
-                'A password is required to log in.'
-            )
+            raise serializers.ValidationError(EMPTY_PASSWORD)
 
-        user = authenticate(username=email, password=password)
+        self.user = authenticate(username=email, password=password)
 
-        if user is None:
-            raise serializers.ValidationError(
-                'A user with this email and password was not found.'
-            )
+        if self.user is None:
+            raise serializers.ValidationError(USER_DOES_NOT_EXIST)
 
         return {'status': True}
   

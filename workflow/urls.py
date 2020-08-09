@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import WorkflowView
+from . import views
 
 app_name = "workflow"
 
 # app_name will help us do a reverse look-up latter.
 urlpatterns = [
-    path('', WorkflowView.as_view()),
+    path('api/', views.WorkflowView.as_view()),
+    path('', views.workflows),
 ]

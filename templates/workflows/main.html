@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Логин
+{% endblock %}
+
+{% block content %}
+    <div class="navbar bg-white breadcrumb-bar">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Overview</a>
+          </li>
+          <li class="breadcrumb-item"><a href="pages-app.html#">App Pages</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Project</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-11 col-xl-10">
+          <div class="page-header">
+            <h1>Список рабочих пространств</h1>
+            <p class="lead">Рабочее пространство позволяет организовывать задачи в единую группу</p>
+          </div>
+
+          <div class="tab-pane fade active show" id="tasks" role="tabpanel" data-filter-list="card-list-body">
+            <div class="row content-list-head">
+              <div class="col-auto">
+                <h3>Рабочие пространства</h3>
+                <button class="btn btn-round" data-toggle="modal" data-target="#task-add-modal">
+                  <i class="material-icons">add</i>
+                </button>
+              </div>
+            </div>
+            <!--end of content list head-->
+            <div class="content-list-body">
+              <div class="card-list">
+                <div class="card-list-head">
+                  <h6>Доступные</h6>
+                </div>
+                <div class="card-list-body" id="workflow_list">
+                  <div class="card card-task">
+                    <div class="progress">
+                      <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="card-body">
+                      <div class="card-title">
+                        <a href="#">
+                          <h6 data-filter-by="text" class="H6-filter-by-text">Client objective meeting</h6>
+                        </a>
+                        <span class="text-small">Today</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--end of content list body-->
+            </div>
+            <div id="load_list_errors"></div>
+            <!--end of content list-->
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "js/workflow.js" %}" ></script>
+<script>
+    window.onload = function() {
+       WORKFLOW.csrftoken = '{{ csrf_token }}';
+       WORKFLOW.list.init();
+    };
+</script>
+{% endblock %}
