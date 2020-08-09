@@ -13,9 +13,10 @@ class Task(models.Model):
     )
 
     name = models.CharField(max_length=200, verbose_name="Title")
+    description = models.TextField(null=True, blank=True, verbose_name="Description")
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, verbose_name="Workflow")
     users = models.ManyToManyField(User, related_name="task_users", verbose_name="User added to task")
-
+    
     users_order = models.TextField(null=True, blank=True, verbose_name="Execute task users order")
     mode = models.CharField(
         max_length=1,

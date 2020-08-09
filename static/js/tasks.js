@@ -1,6 +1,33 @@
 TASKS = {
     csrftoken: '',
     workflow_id: '',
+    create: {
+        form_instance: undefined,
+        required_fields: ['name', 'description', 'type'],
+        get_data: function() {
+            let data = {
+                'users': []
+            };
+            let that = this;
+
+            this.required_fields.forEach(function(field) {
+                data[field] = that.form_instance.find('[name="' + field + '"]').val();
+            });
+
+            this.form_instance.find('input[name="user_check"]').each(function() {
+                if($(this).prop('checked')) {
+                    data['users'].push($(this).attr('value'));
+                }
+            });
+
+            return data;
+        },
+        init: function() {
+            this.form_instance = $('#task-add-modal');
+
+
+        }
+    },
     list: {
         list_block: undefined,
         list_errors_block: undefined,

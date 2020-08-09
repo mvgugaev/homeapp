@@ -32,7 +32,7 @@ WORKFLOW = {
                         </div>
                         <div class="card-body">
                             <div class="card-title">
-                                <a href="#">
+                                <a href="/workflows/${element.id}">
                                     <h6 data-filter-by="text" class="H6-filter-by-text">${element.name}</h6>
                                 </a>
                                 <span class="text-small">${element.created_at}</span>

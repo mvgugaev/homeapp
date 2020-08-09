@@ -61,6 +61,78 @@
         </div>
       </div>
     </div>
+
+
+
+    <form class="modal fade" id="task-add-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Новая задача</h5>
+              <button type="button" class="close btn btn-round" data-dismiss="modal" aria-label="Close">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+            <!--end of modal head-->
+            <ul class="nav nav-tabs nav-fill" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="task-add-details-tab" data-toggle="tab" href="#task-add-details" role="tab" aria-controls="task-add-details" aria-selected="true">Информация</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="task-add-members-tab" data-toggle="tab" href="#task-add-members" role="tab" aria-controls="task-add-members" aria-selected="false">Исполнители</a>
+              </li>
+            </ul>
+            <div class="modal-body">
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="task-add-details" role="tabpanel">
+                  <h6>Общая информация</h6>
+                  <div class="form-group row align-items-center">
+                    <label class="col-3">Название</label>
+                    <input class="form-control col" type="text" placeholder="Task name" name="name" />
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-3">Описание</label>
+                    <textarea class="form-control col" rows="3" placeholder="Task description" name="description"></textarea>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-3">Режим исполнения</label>
+                    <select class="mr-sm-2" id="inlineFormCustomSelect" name="type">
+                        <option value="0">Разовая</option>
+                        <option value="1">Повтор</option>
+                        <option value="2">Повтор по времени</option>
+                        <option value="3">Повтор по порядку</option>
+                        <option value="4">Повтор по порядку и времени</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="task-add-members" role="tabpanel">
+                  <div class="users-manage" data-filter-list="form-group-users">
+                    <div class="form-group-users">
+                      {% for user in workflow.users.all %}  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="task-user-1" name="user_check" value="{{ user.id }}" checked>
+                        <label class="custom-control-label" for="task-user-1">
+                          <span class="d-flex align-items-center">
+                            <img alt="Claire Connors" src="{% static "images/default_avatar.png" %}" class="avatar mr-2" />
+                            <span class="h6 mb-0" data-filter-by="text">{{ user.email }}</span>
+                          </span>
+                        </label>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end of modal body-->
+            <div class="modal-footer">
+              <button role="button" class="btn btn-primary" type="submit">
+                Создать задачу
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
 {% endblock %}
 
 {% block scripts %}

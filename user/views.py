@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,6 +9,9 @@ from .serializers import *
 
 
 def login(request):
+
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/workflows/')
 
     render_contect = {
         'page_without_layout': True

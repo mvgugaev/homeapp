@@ -12,13 +12,14 @@
             <div class="col-xl-5 col-lg-6 col-md-7">
               <div class="text-center">
                 <h1 class="h2">Добро пожаловать 👋</h1>
-                <p class="lead">Войдите в личный кабинет что бы продолжить</p>
+                <p class="lead">Войдите в личный кабинет чтобы продолжить</p>
                 <form id="login_form">
                   <div class="form-group">
                     <input class="form-control" type="email" name="email" placeholder="Email адрес" required>
                   </div>
-                  <div class="form-group">
+                  <div class="form-group password_form_group">
                     <input class="form-control" type="password" name="password" placeholder="Пароль" required>
+                    <span _ngcontent-qvy-c19="" class="material-icons password_vidibility_icon" id="password_vidibility">remove_red_eye</span>
                   </div>
                   {% csrf_token %}
                   <div id="login_form_errors"></div>
@@ -34,6 +35,24 @@
 {% endblock %}
 
 {% block style %}
+<style>
+  .password_form_group {
+     position: relative;
+  }
+
+  .password_vidibility_icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: 6px 10px 0 0;
+      color: #c5c4c4;
+      cursor: pointer;
+  }
+
+  .password_vidibility_icon.active {
+      color: #000000;
+  }
+</style>
 {% endblock %}
 
 {% block scripts %}
