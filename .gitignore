@@ -2,5 +2,6 @@ production.py
 *.pyc
 __pycache__/
 migrations/
-/static
+/static/admin
+/static/rest_framework
 
