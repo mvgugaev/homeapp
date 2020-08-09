@@ -35,7 +35,7 @@ class TaskView(APIView):
         tasks = Task.objects.none()
 
         if workflow_id:
-            workflow = slef.get_workflow(workflow_id, request.user)
+            workflow = self.get_workflow(request.user, workflow_id)
 
             tasks = Task.objects.filter(workflow = workflow)
         else:
