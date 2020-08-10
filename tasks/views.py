@@ -10,6 +10,7 @@ from workflow.models import Workflow
 class TaskView(APIView):
 
     permission_classes = (IsAuthenticated,)
+    serializer_class = TaskSerializer
 
     def get_workflow(self, user, id):
         try:
@@ -44,13 +45,15 @@ class TaskView(APIView):
             for workflow in accept_workflows:
                 tasks = tasks | Task.objects.filter(workflow = workflow)
 
-        serializer = TaskSerializer(tasks, many=True)
+        tasks = tasks.order_by('-created_at')
+
+        serializer = self.serializer_class(tasks, many=True)
         return Response({"tasks": serializer.data})
 
     def post(self, request):
 
         task = request.data.get('task')
-        serializer = TaskSerializer(data=task, context={'request': request})
+        serializer = self.serializer_class(data=task, context={'request': request})
 
         if serializer.is_valid(raise_exception=True):
             task_saved = serializer.save()

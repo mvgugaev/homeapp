@@ -9,11 +9,11 @@
     <div class="navbar bg-white breadcrumb-bar">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Overview</a>
+          <li class="breadcrumb-item">Сервис
           </li>
-          <li class="breadcrumb-item"><a href="pages-app.html#">App Pages</a>
+          <li class="breadcrumb-item"><a href="/workflows/">Главная</a>
           </li>
-          <li class="breadcrumb-item active" aria-current="page">Project</li>
+          <li class="breadcrumb-item active" aria-current="page">{{ workflow.name }}</li>
         </ol>
       </nav>
     </div>
@@ -94,9 +94,12 @@
                     <label class="col-3">Описание</label>
                     <textarea class="form-control col" rows="3" placeholder="Task description" name="description"></textarea>
                   </div>
+
+                  <input type="hidden" name="workflow_id" value="{{ workflow.id }}" />
+            
                   <div class="form-group row">
                     <label class="col-3">Режим исполнения</label>
-                    <select class="mr-sm-2" id="inlineFormCustomSelect" name="type">
+                    <select class="mr-sm-2" id="inlineFormCustomSelect" name="mode">
                         <option value="0">Разовая</option>
                         <option value="1">Повтор</option>
                         <option value="2">Повтор по времени</option>
@@ -113,7 +116,7 @@
                         <input type="checkbox" class="custom-control-input" id="task-user-1" name="user_check" value="{{ user.id }}" checked>
                         <label class="custom-control-label" for="task-user-1">
                           <span class="d-flex align-items-center">
-                            <img alt="Claire Connors" src="{% static "images/default_avatar.png" %}" class="avatar mr-2" />
+                            <img alt="Claire Connors" src="{{ user.avatar_url }}" class="avatar mr-2" />
                             <span class="h6 mb-0" data-filter-by="text">{{ user.email }}</span>
                           </span>
                         </label>
@@ -141,6 +144,7 @@
     window.onload = function() {
        TASKS.csrftoken = '{{ csrf_token }}';
        TASKS.list.init('{{ workflow.id }}');
+       TASKS.create.init();
     };
 </script>
 {% endblock %}

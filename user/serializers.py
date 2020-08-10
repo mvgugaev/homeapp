@@ -8,10 +8,15 @@ class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(label='ID')
     username = serializers.CharField(required=False)
     email = serializers.CharField(required=False)
+    avatar_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
         fields = ("id", "username", "email")
+
+    def get_avatar_url(self, obj):
+        profile = Profile.objects.get(user=obj)
+        return profile.avatar.url if profile.avatar else '/static/images/default_avatar.png'
 
 
 class LoginSerializer(serializers.Serializer):

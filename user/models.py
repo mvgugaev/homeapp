@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
-    avatar = models.ImageField(verbose_name="User avatar")
+    avatar = models.ImageField(verbose_name="User avatar", upload_to='avatars/')
 
     # Meta fields
     created_at = models.DateTimeField(auto_now_add=True)
@@ -16,4 +16,5 @@ class Profile(models.Model):
         verbose_name_plural = "Profiles"
 
     def __str__(self):
-        return '{0} [{1}]'.format(self.user.email)
+        return '{0}'.format(self.user.email)
+

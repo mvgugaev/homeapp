@@ -3,7 +3,7 @@ TASKS = {
     workflow_id: '',
     create: {
         form_instance: undefined,
-        required_fields: ['name', 'description', 'type'],
+        required_fields: ['name', 'description', 'mode', 'workflow_id'],
         get_data: function() {
             let data = {
                 'users': []
@@ -16,14 +16,46 @@ TASKS = {
 
             this.form_instance.find('input[name="user_check"]').each(function() {
                 if($(this).prop('checked')) {
-                    data['users'].push($(this).attr('value'));
+                    data['users'].push({
+                        'id': $(this).attr('value')
+                    });
                 }
             });
 
             return data;
         },
+        create_task: function() {
+            let request_data = {
+                'task': this.get_data()
+            }
+
+            $.ajax({
+                url : "/tasks/api/",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(request_data),
+                headers: {
+                    "X-CSRFToken": TASKS.csrftoken
+                },
+                success : function (data) {
+                    console.log('True');
+                },
+                error: function (data, exception) {
+                    console.log('Error');
+                },
+            });
+        },
         init: function() {
             this.form_instance = $('#task-add-modal');
+
+            let that = this;
+
+            this.form_instance.on('submit', function(e) {
+                e.preventDefault();
+
+                that.create_task();
+            });
 
 
         }
@@ -52,18 +84,42 @@ TASKS = {
             let list_content = '';
 
             data.forEach(function(element) {
+
+                let user_list = '';
+
+                element.users.forEach(function(user) {
+                    user_list += `
+                    <li>
+                        <a href="#" data-toggle="tooltip" title="" data-original-title="${user.email}">
+                          <img alt="${user.username}" class="avatar" src="${user.avatar_url}">
+                        </a>
+                    </li>
+                    `;
+                });
+
                 list_content += `
                     <div class="card card-task">
-                        <div class="progress">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                            </div>
-                        </div>
                         <div class="card-body">
                             <div class="card-title">
                                 <a href="#">
                                     <h6 data-filter-by="text" class="H6-filter-by-text">${element.name}</h6>
                                 </a>
                                 <span class="text-small">${element.created_at}</span>
+                            </div>
+                            <div class="card-meta">
+                              <ul class="avatars">
+                                ${user_list}
+                              </ul>
+                              <div class="dropdown card-options">
+                                <button class="btn-options" type="button" id="task-dropdown-button-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <i class="material-icons">more_vert</i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-132px, 24px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                  <a class="dropdown-item" href="#">Выполнено</a>
+                                  <div class="dropdown-divider"></div>
+                                  <a class="dropdown-item text-danger" href="#">Закрыть</a>
+                                </div>
+                              </div>
                             </div>
                         </div>
                     </div>

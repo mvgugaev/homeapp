@@ -1,5 +1,7 @@
 from django.db import models
 from workflow.models import *
+from django.contrib.auth.models import User
+
 
 # Workflow task model
 class Task(models.Model):
@@ -16,6 +18,7 @@ class Task(models.Model):
     description = models.TextField(null=True, blank=True, verbose_name="Description")
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, verbose_name="Workflow")
     users = models.ManyToManyField(User, related_name="task_users", verbose_name="User added to task")
+    executor = models.ForeignKey(User, null=True, on_delete=models.CASCADE, verbose_name="Executor")
     
     users_order = models.TextField(null=True, blank=True, verbose_name="Execute task users order")
     mode = models.CharField(
@@ -26,6 +29,9 @@ class Task(models.Model):
 
     change_order_date = models.DateTimeField(auto_now_add=True, verbose_name="Change order")
     delay = models.IntegerField(default=0, verbose_name="Task delay")
+
+    compleated = models.BooleanField(default=False, verbose_name="Is compleated")
+    closed = models.BooleanField(default=False, verbose_name="Is closed")
 
     # Meta fields
     created_at = models.DateTimeField(auto_now_add=True)

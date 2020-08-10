@@ -6,7 +6,7 @@ from workflow.models import Workflow
 from workflow.serializers import WorkflowSerializer
 from user.serializers import UserSerializer
 
-BASE_DATETIME_FORMAT = "%d:%m:%Y %H:%M"
+BASE_DATETIME_FORMAT = "%d.%m.%Y %H:%M"
 
 class TaskWorkflowSerializer(serializers.Serializer):
     id = serializers.IntegerField(label='ID')
@@ -20,15 +20,15 @@ class TaskSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     users_order = serializers.CharField(required=False, allow_blank=True)
     mode = serializers.CharField()
-    delay = serializers.IntegerField()
+    delay = serializers.IntegerField(required=False)
 
     workflow_id = serializers.CharField(required=False)
     workflow = WorkflowSerializer(read_only=True)
     users = UserSerializer(many=True)
 
-    change_order_date = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT])
-    created_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT])
-    updated_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT])
+    change_order_date = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], required=False)
+    created_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], read_only=True)
+    updated_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], read_only=True)
 
     def get_workflow(self, user, id):
         try:
