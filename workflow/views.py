@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
+from user.models import Profile
 from .models import *
 from .serializers import *
 
@@ -34,9 +35,16 @@ def workflow(request, workflow_id):
     
     if workflow.owner != request.user and request.user not in workflow.users:
         raise Http404
+    
+    # TODO: Fix havy DB load code
+    accept_user_profile = []
+
+    for user in workflow.users.all():
+        accept_user_profile.append(Profile.objects.get(user=user))
 
     render_context = {
-        'workflow': workflow
+        'workflow': workflow,
+        'accept_user_profile': accept_user_profile
     }
 
     return render(request, 'workflows/single.html', render_context)

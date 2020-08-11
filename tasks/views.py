@@ -30,20 +30,28 @@ class TaskView(APIView):
         except Workflow.DoesNotExist:
             raise Http404
 
-    def get(self, request, workflow_id=None):
+    def get(self, request, task_id=None):
+
+        workflow_id = self.request.query_params.get('workflow_id', None)
         
         # Empty tasks queryset
         tasks = Task.objects.none()
 
+        # Additional filter
+        query_filters = {}
+
+        if task_id:
+            query_filters['id'] = task_id
+
         if workflow_id:
             workflow = self.get_workflow(request.user, workflow_id)
 
-            tasks = Task.objects.filter(workflow = workflow)
+            tasks = Task.objects.filter(workflow = workflow, **query_filters)
         else:
             accept_workflows = Workflow.objects.filter(owner = self.request.user) | Workflow.objects.filter(users__id__exact=self.request.user.id)
 
             for workflow in accept_workflows:
-                tasks = tasks | Task.objects.filter(workflow = workflow)
+                tasks = tasks | Task.objects.filter(workflow = workflow, **query_filters)
 
         tasks = tasks.order_by('-created_at')
 
@@ -58,6 +66,8 @@ class TaskView(APIView):
         if serializer.is_valid(raise_exception=True):
             task_saved = serializer.save()
             task_saved.users.add(*serializer.users)
+            task_saved.save()
+            task_saved.set_executor_by_order()
             task_saved.save()
 
         return Response({"success": "Task '{}' created successfully".format(task_saved.name)})

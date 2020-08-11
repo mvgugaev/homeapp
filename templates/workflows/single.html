@@ -34,35 +34,22 @@
                 </button>
               </div>
             </div>
+
+            <div id="load_list_errors"></div>
+
             <!--end of content list head-->
             <div class="content-list-body">
               <div class="card-list">
                 <div class="card-list-body" id="workflow_list">
-                  <div class="card card-task">
-                    <div class="progress">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="card-body">
-                      <div class="card-title">
-                        <a href="#">
-                          <h6 data-filter-by="text" class="H6-filter-by-text">Client objective meeting</h6>
-                        </a>
-                        <span class="text-small">Today</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
               <!--end of content list body-->
             </div>
-            <div id="load_list_errors"></div>
             <!--end of content list-->
           </div>
         </div>
       </div>
     </div>
-
-
 
     <form class="modal fade" id="task-add-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -88,18 +75,18 @@
                   <h6>Общая информация</h6>
                   <div class="form-group row align-items-center">
                     <label class="col-3">Название</label>
-                    <input class="form-control col" type="text" placeholder="Task name" name="name" />
+                    <input class="form-control col" type="text" placeholder="Что надо сделать?" name="name" />
                   </div>
                   <div class="form-group row">
                     <label class="col-3">Описание</label>
-                    <textarea class="form-control col" rows="3" placeholder="Task description" name="description"></textarea>
+                    <textarea class="form-control col" rows="3" placeholder="Более подробное описание" name="description"></textarea>
                   </div>
 
                   <input type="hidden" name="workflow_id" value="{{ workflow.id }}" />
             
                   <div class="form-group row">
                     <label class="col-3">Режим исполнения</label>
-                    <select class="mr-sm-2" id="inlineFormCustomSelect" name="mode">
+                    <select class="form-control col" id="inlineFormCustomSelect" name="mode">
                         <option value="0">Разовая</option>
                         <option value="1">Повтор</option>
                         <option value="2">Повтор по времени</option>
@@ -107,17 +94,30 @@
                         <option value="4">Повтор по порядку и времени</option>
                     </select>
                   </div>
+                  <hr>
+                  <h6>Настройки времени и периода</h6>
+                  <div class="form-group row align-items-center">
+                    <label class="col-3">Дата окончания</label>
+                    <input class="form-control col flatpickr-input" type="hidden" name="last_date" placeholder="Укажите дату">
+                  </div>
+                  <div class="form-group row align-items-center">
+                    <label class="col-3">Цикл обновления</label>
+                    <input class="form-control col" type="text" placeholder="Количество часов" value="24" name="cycle" />
+                  </div>
                 </div>
                 <div class="tab-pane fade" id="task-add-members" role="tabpanel">
-                  <div class="users-manage" data-filter-list="form-group-users">
+                  <div class="alert alert-secondary" role="alert">
+                    Первый участник задачи для повторения по порядку будет выбран активным исполнителем, участников можно менять местами.
+                  </div>
+                  <div class="users-manage" data-filter-list="form-group-users" style="padding-left: 10px;">
                     <div class="form-group-users">
-                      {% for user in workflow.users.all %}  
+                      {% for user_profile in accept_user_profile %}  
                       <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="task-user-1" name="user_check" value="{{ user.id }}" checked>
-                        <label class="custom-control-label" for="task-user-1">
+                        <input type="checkbox" class="custom-control-input" id="task-user-{{ user_profile.user.id }}" name="user_check" value="{{ user_profile.user.id }}" {% if profile and profile.id == user_profile.id %}checked{% endif %}>
+                        <label class="custom-control-label" for="task-user-{{ user_profile.user.id }}">
                           <span class="d-flex align-items-center">
-                            <img alt="Claire Connors" src="{{ user.avatar_url }}" class="avatar mr-2" />
-                            <span class="h6 mb-0" data-filter-by="text">{{ user.email }}</span>
+                            <img alt="Claire Connors" src="{{ user_profile.avatar.url }}" class="avatar mr-2" />
+                            <span class="h6 mb-0" data-filter-by="text">{{ user_profile.user.email }}</span>
                           </span>
                         </label>
                       </div>
@@ -127,6 +127,9 @@
                 </div>
               </div>
             </div>
+
+            <div id="add_task_form_errors"></div>
+
             <!--end of modal body-->
             <div class="modal-footer">
               <button role="button" class="btn btn-primary" type="submit">
@@ -140,6 +143,8 @@
 
 {% block scripts %}
 <script src="{% static "js/tasks.js" %}" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5sortable/0.9.17/html5sortable.min.js" ></script>
+
 <script>
     window.onload = function() {
        TASKS.csrftoken = '{{ csrf_token }}';
