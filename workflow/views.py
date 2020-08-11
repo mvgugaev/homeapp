@@ -33,7 +33,7 @@ def workflow(request, workflow_id):
     except Workflow.DoesNotExist:
         raise Http404
     
-    if workflow.owner != request.user and request.user not in workflow.users:
+    if workflow.owner != request.user and request.user not in workflow.users.all():
         raise Http404
     
     # TODO: Fix havy DB load code

@@ -24,7 +24,7 @@ class TaskView(APIView):
         try:
             task = Task.objects.get(id=id)
 
-            if task.workflow.owner != user and user not in task.workflow.users:
+            if task.workflow.owner != user and user not in task.workflow.users.all():
                 raise Http404
 
             return task
