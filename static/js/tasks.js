@@ -67,6 +67,7 @@ TASKS = {
         create_task: function() {
             let that = this;
             let request_data = {
+                'type': 'create',
                 'task': this.get_data()
             }
 
@@ -146,6 +147,91 @@ TASKS = {
         set_errors: function(data) {
             TASKS.list.list_errors_block.html(TASKS.list.error_list_create(data));
         },
+        block_task: function(element) {
+            element.css({'pointer-events': 'none', 'opacity': 0.8});
+        },
+        unblock_task: function(element) {
+            element.css({'pointer-events': 'auto', 'opacity': 1});
+        },
+        set_task_events: function(element) {
+
+            let that = this;
+
+            element.find('.exec_task').on('click', function() {
+                  let parent_element = $(this).closest('.card-task');
+                  let task_id = $(this).attr('data-id');
+
+                  that.exec_task(task_id, parent_element);  
+              });
+        },
+        set_tasks_events: function() {
+
+            let that = this;
+
+            this.list_block.find('.card-task').each(function() {
+                console.log('asdasd');
+                that.set_task_events($(this));
+            });
+        },
+        render_task_element: function(task_id, element) {
+            this.block_task(element);
+            let that = this;
+            
+            $.ajax({
+                url : "/tasks/api/" + task_id,
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                headers: {
+                    "X-CSRFToken": TASKS.csrftoken
+                },
+                success : function (data) {
+
+                    let task_data = data['tasks'][0];
+                    let task_element = $(that.render_list_element(task_data));
+
+                    $(element).replaceWith(task_element);
+                    that.set_task_events(task_element);
+                    that.unblock_task(task_element);
+                },
+                error: function (data, exception) {
+                    that.unblock_task(element);
+                    that.list_errors_block.html(TASKS.error_list_create(data.responseJSON));
+                },
+            });
+
+        },
+        exec_task: function(task_id, element) {
+
+            this.block_task(element);
+
+            let that = this;
+            let request_data = {
+                'type': 'exec',
+                'task': {
+                    'id': task_id
+                }
+            }
+
+            $.ajax({
+                url : "/tasks/api/",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(request_data),
+                headers: {
+                    "X-CSRFToken": TASKS.csrftoken
+                },
+                success : function (data) {
+                    that.unblock_task(element);
+                    that.render_task_element(task_id, element);
+                },
+                error: function (data, exception) {
+                    that.unblock_task(element);
+                    that.list_errors_block.html(TASKS.error_list_create(data.responseJSON));
+                },
+            });
+        },
         render_list_element: function(data) {
 
             let user_list = '';
@@ -190,9 +276,10 @@ TASKS = {
                             <i class="material-icons">more_vert</i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-132px, 24px, 0px); top: 0px; left: 0px; will-change: transform;">
-                            <a class="dropdown-item" href="#">Выполнено</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#">Закрыть</a>
+                                <a class="dropdown-item exec_task" data-id="${data.id}" style="${data.compleated ? 'opacity:0.4; pointer-events:none;': ''}">Выполнить</a>
+                                <div class="dropdown-divider">
+                                </div>
+                                <a class="dropdown-item text-danger" href="#">Закрыть</a>
                             </div>
                         </div>
                         </div>
@@ -215,9 +302,10 @@ TASKS = {
         render_list: function(data) {
             let content_list = TASKS.list.create_list(data);
 
-            $('#workflow_list').html(content_list);
+            $('#tasks_list').html(content_list);
+            this.set_tasks_events();
         },
-        load_data: function(data_callback, error_callback) {
+        load_data: function() {
             let that = this;
             $.ajax({
                 url : "/tasks/api/?workflow_id=" + TASKS.workflow_id,
@@ -228,11 +316,11 @@ TASKS = {
                     "X-CSRFToken": TASKS.csrftoken
                 },
                 success : function (data) {
-                    data_callback(data['tasks']);
+                    that.render_list(data['tasks']);
                     that.unblock_list();
                 },
                 error: function (data, exception) {
-                    error_callback(data.responseJSON);
+                    that.set_errors(data.responseJSON);
                     that.unblock_list();
                 },
             });
@@ -248,7 +336,7 @@ TASKS = {
             this.block_list();
 
             try {
-                this.load_data(this.render_list, this.set_errors);
+                this.load_data();
             }
             catch (e) {
 

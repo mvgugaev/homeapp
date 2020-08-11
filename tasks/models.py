@@ -72,6 +72,19 @@ class Task(models.Model):
         
             self.save()
 
+    def exec_task(self):
+
+        if self.mode in ('0', '2', '4'):
+            self.compleated = True
+
+        if self.mode == '3':
+            self.set_next_executor()
+
+        if self.delay > 0:
+            self.delay -= 1
+
+        self.save()
+
 
 
 # Workflow task history model

@@ -5,17 +5,30 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import *
 from .serializers import *
+from .errors import *
 from workflow.models import Workflow
 
 class TaskView(APIView):
 
     permission_classes = (IsAuthenticated,)
     serializer_class = TaskSerializer
+    accept_post_methods = ('create', 'exec', 'close', 'delete')
 
     def get_workflow(self, user, id):
         try:
             return Workflow.objects.get(id=id, users__id__exact=user.id)
         except Workflow.DoesNotExist:
+            raise Http404
+
+    def get_task(self, user, id):
+        try:
+            task = Task.objects.get(id=id)
+
+            if task.workflow.owner != user and user not in task.workflow.users:
+                raise Http404
+
+            return task
+        except Task.DoesNotExist:
             raise Http404
 
 
@@ -29,6 +42,8 @@ class TaskView(APIView):
             return user
         except Workflow.DoesNotExist:
             raise Http404
+
+    
 
     def get(self, request, task_id=None):
 
@@ -60,14 +75,35 @@ class TaskView(APIView):
 
     def post(self, request):
 
-        task = request.data.get('task')
-        serializer = self.serializer_class(data=task, context={'request': request})
+        method_type = request.data.get('type', None)
+        task = request.data.get('task', None)
 
-        if serializer.is_valid(raise_exception=True):
-            task_saved = serializer.save()
-            task_saved.users.add(*serializer.users)
-            task_saved.save()
-            task_saved.set_executor_by_order()
-            task_saved.save()
+        if not method_type or method_type not in self.accept_post_methods:
+            raise serializers.ValidationError(UNDEFINED_METHOD)
 
-        return Response({"success": "Task '{}' created successfully".format(task_saved.name)})
+        if not task:
+            raise serializers.ValidationError(UNDEFINED_TASK_PARAM)
+
+        if method_type == 'create':
+            serializer = self.serializer_class(data=task, context={'request': request})
+
+            if serializer.is_valid(raise_exception=True):
+                task_saved = serializer.save()
+                task_saved.users.add(*serializer.users)
+                task_saved.save()
+                task_saved.set_executor_by_order()
+                task_saved.save()
+
+            return Response({"success": "Task '{}' created successfully".format(task_saved.name)})
+        
+        elif method_type == 'exec':
+            
+            task_id = task.get('id', None)
+
+            if not task_id:
+                raise serializers.ValidationError(TASK_ID_REQUIRED)
+
+            task = self.get_task(request.user, task_id)
+            task.exec_task()
+
+            return Response({"success": "Task '{}' compleated successfully".format(task.name)})
