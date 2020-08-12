@@ -12,7 +12,7 @@ class TaskView(APIView):
 
     permission_classes = (IsAuthenticated,)
     serializer_class = TaskSerializer
-    accept_post_methods = ('create', 'exec', 'close', 'delete')
+    accept_post_methods = ('create', 'exec', 'change_status', 'delete')
 
     def get_workflow(self, user, id):
         try:
@@ -107,3 +107,31 @@ class TaskView(APIView):
             task.exec_task()
 
             return Response({"success": "Task '{}' compleated successfully".format(task.name)})
+
+        elif method_type == 'change_status':
+            
+            task_id = task.get('id', None)
+            status = task.get('status', None)
+
+            if status is None:
+                raise serializers.ValidationError(TASK_STATUS_REQUIRED)
+
+            if not task_id:
+                raise serializers.ValidationError(TASK_ID_REQUIRED)
+            
+            task = self.get_task(request.user, task_id)
+            task.change_task_status(status)
+
+            return Response({"success": "Task '{}' changed successfully".format(task.name)})
+
+        elif method_type == 'delete':
+            
+            task_id = task.get('id', None)
+
+            if not task_id:
+                raise serializers.ValidationError(TASK_ID_REQUIRED)
+            
+            task = self.get_task(request.user, task_id)
+            task.delete()
+
+            return Response({"success": "Task deleted successfully"})

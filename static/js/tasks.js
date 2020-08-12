@@ -157,12 +157,44 @@ TASKS = {
 
             let that = this;
 
-            element.find('.exec_task').on('click', function() {
+            element.find('.exec_task').on('click', function(e) {
+                  e.preventDefault();
                   let parent_element = $(this).closest('.card-task');
                   let task_id = $(this).attr('data-id');
 
                   that.exec_task(task_id, parent_element);  
-              });
+            });
+
+            element.find('.change_task_status').on('click', function(e) {
+                e.preventDefault();
+                let parent_element = $(this).closest('.card-task');
+                let task_id = $(this).attr('data-id');
+                let status_code = $(this).attr('data-status');
+                let status = status_code != '0';
+
+                that.change_status(task_id, status, parent_element);  
+            });
+
+            element.find('.delete_task').on('click', function(e) {
+                e.preventDefault();
+                let parent_element = $(this).closest('.card-task');
+                let task_id = $(this).attr('data-id');
+
+                Swal.fire({
+                    title: 'Удалить задачу?',
+                    text: "История задачи будет удалена без возможности восстановления!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Удалить',
+                    cancelButtonText: 'Отменить'
+                  }).then((result) => {
+                    if (result.value) {
+                        that.delete(task_id, parent_element);
+                    }
+                  }); 
+            });
         },
         set_tasks_events: function() {
 
@@ -200,6 +232,67 @@ TASKS = {
                 },
             });
 
+        },
+        change_status: function(task_id, status, element) {
+            this.block_task(element);
+
+            let that = this;
+            let request_data = {
+                'type': 'change_status',
+                'task': {
+                    'id': task_id,
+                    'status': status
+                }
+            }
+
+            $.ajax({
+                url : "/tasks/api/",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(request_data),
+                headers: {
+                    "X-CSRFToken": TASKS.csrftoken
+                },
+                success : function (data) {
+                    that.unblock_task(element);
+                    that.update_list();
+                },
+                error: function (data, exception) {
+                    that.unblock_task(element);
+                    that.list_errors_block.html(TASKS.error_list_create(data.responseJSON));
+                },
+            });
+        },
+        delete: function(task_id, element) {
+            this.block_task(element);
+
+            let that = this;
+            let request_data = {
+                'type': 'delete',
+                'task': {
+                    'id': task_id,
+                }
+            }
+
+            $.ajax({
+                url : "/tasks/api/",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(request_data),
+                headers: {
+                    "X-CSRFToken": TASKS.csrftoken
+                },
+                success : function (data) {
+                    that.unblock_task(element);
+                    that.update_list();
+                },
+                error: function (data, exception) {
+                    that.unblock_task(element);
+                    that.list_errors_block.html(TASKS.error_list_create(data.responseJSON));
+                },
+            });
         },
         exec_task: function(task_id, element) {
 
@@ -276,10 +369,13 @@ TASKS = {
                             <i class="material-icons">more_vert</i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-132px, 24px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                <a class="dropdown-item exec_task" data-id="${data.id}" style="${data.compleated ? 'opacity:0.4; pointer-events:none;': ''}">Выполнить</a>
+                                <a class="dropdown-item exec_task text-success" href="#" data-id="${data.id}" style="${data.compleated ? 'opacity:0.4; pointer-events:none;': ''}">Выполнить</a>
                                 <div class="dropdown-divider">
                                 </div>
-                                <a class="dropdown-item text-danger" href="#">Закрыть</a>
+                                <a class="dropdown-item change_task_status text-info" data-id="${data.id}" data-status="${data.closed ? '0': '1'}" href="#">${data.closed ? 'Открыть': 'Закрыть'}</a>
+                                <div class="dropdown-divider">
+                                </div>
+                                <a class="dropdown-item delete_task text-danger" data-id="${data.id}" href="#">Удалить</a>
                             </div>
                         </div>
                         </div>

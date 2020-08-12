@@ -85,7 +85,9 @@ class Task(models.Model):
 
         self.save()
 
-
+    def change_task_status(self, closed: bool):
+        self.closed = closed
+        self.save()
 
 # Workflow task history model
 class TaskChangeHistory(models.Model):
