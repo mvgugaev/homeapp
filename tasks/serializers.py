@@ -40,6 +40,8 @@ class TaskSerializer(serializers.Serializer):
     compleated = serializers.BooleanField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
 
+    to_retry_count_day = serializers.IntegerField(read_only=True)
+
     def get_workflow(self, user, id):
         try:
             return Workflow.objects.get(id=id, users__id__exact=user.id)

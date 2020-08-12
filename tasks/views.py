@@ -70,8 +70,17 @@ class TaskView(APIView):
 
         tasks = tasks.order_by('-created_at')
 
+        stat = {}
+
+        # Stat block, closed, compleated, all task count
+        if task_id is None:
+            stat['all'] = tasks.count()
+            stat['opened'] = tasks.filter(closed=False).count()
+            stat['compleated'] = tasks.filter(closed=False, compleated=True).count()
+            stat['progress'] = int(stat['compleated'] / stat['opened'] * 100) if stat['all'] > 0 else 0
+
         serializer = self.serializer_class(tasks, many=True)
-        return Response({"tasks": serializer.data})
+        return Response({"tasks": serializer.data, 'stat': stat})
 
     def post(self, request):
 

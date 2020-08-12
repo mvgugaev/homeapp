@@ -356,6 +356,10 @@ TASKS = {
                             <span class="text-small">${task_type_text[data.mode]}</span>
                         </div>
                         <div class="card-meta">
+                        ${data.mode == '4' && !data.compleated ? `
+                        <div class="d-flex align-items-center mr-2" style="${data.to_retry_count_day <= 2 ? 'color:red;' : 'opacity:0.4;'}">
+                            <span>Осталось: ${data.to_retry_count_day} дней(я) </span>
+                        </div>` : ``}
                         ${data.compleated ? `
                             <div class="d-flex align-items-center mr-2">
                                 <i class="material-icons">playlist_add_check</i>
@@ -401,6 +405,10 @@ TASKS = {
             $('#tasks_list').html(content_list);
             this.set_tasks_events();
         },
+        set_stat: function(stat_data) {
+            $('#tasks_progress').css({'width': stat_data['progress'] + '%'});
+            $('#tasks_progress_count').html(stat_data['compleated'] + '/' + stat_data['opened']);
+        },
         load_data: function() {
             let that = this;
             $.ajax({
@@ -413,6 +421,7 @@ TASKS = {
                 },
                 success : function (data) {
                     that.render_list(data['tasks']);
+                    that.set_stat(data['stat']);
                     that.unblock_list();
                 },
                 error: function (data, exception) {
@@ -443,8 +452,6 @@ TASKS = {
                 that.list_errors_block.html(TASKS.error_list_create(error_data));
                 that.unblock_list();
             }
-
-            this.load_data(this.render_list, this.set_errors);
         },
         init: function(workflow_id) {
             

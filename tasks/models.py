@@ -69,7 +69,7 @@ class Task(models.Model):
 
             self.users_order = json.dumps(order)
             self.set_executor_by_order()
-        
+            self.change_order_date = datetime.now()
             self.save()
 
     def exec_task(self):
@@ -88,6 +88,19 @@ class Task(models.Model):
     def change_task_status(self, closed: bool):
         self.closed = closed
         self.save()
+
+    @property
+    def to_retry_count_day(self):
+
+        if self.change_order_date:
+            current_date = datetime.now()
+            date_diff = current_date - self.change_order_date.replace(tzinfo=None)
+
+            return self.cycle - date_diff.days
+
+        return 0
+
+
 
 # Workflow task history model
 class TaskChangeHistory(models.Model):
