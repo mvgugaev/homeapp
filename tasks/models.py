@@ -31,8 +31,9 @@ class Task(models.Model):
     change_order_date = models.DateTimeField(verbose_name="Change order")
     last_date = models.DateTimeField(verbose_name="Compleate date limit")
     delay = models.IntegerField(default=0, verbose_name="Task delay")
-    cycle = models.IntegerField(default=0, verbose_name="Hours of cycle")
+    cycle = models.IntegerField(default=0, verbose_name="Days of cycle")
 
+    use_retry_fail_executor = models.BooleanField(default=False, verbose_name="Retry current executor if time limit is lost")
     compleated = models.BooleanField(default=False, verbose_name="Is compleated")
     closed = models.BooleanField(default=False, verbose_name="Is closed")
 
@@ -47,8 +48,10 @@ class Task(models.Model):
     def __str__(self):
         return '{0} [{1}]'.format(self.name, self.workflow.name)
 
-    def save(self, *args, **kwargs): 
-        self.change_order_date = datetime.now()
+    def save(self, *args, **kwargs):
+        if not self.pk: 
+            self.change_order_date = datetime.now()
+            
         super(Task, self).save(*args, **kwargs)
 
     def set_executor_by_order(self):
@@ -68,7 +71,10 @@ class Task(models.Model):
             order = order[1:] + order[:1]
 
             self.users_order = json.dumps(order)
-            self.set_executor_by_order()
+
+            if self.to_retry_count_day >= -1:
+                self.set_executor_by_order()
+
             self.change_order_date = datetime.now()
             self.save()
 

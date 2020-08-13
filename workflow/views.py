@@ -15,9 +15,29 @@ class WorkflowView(APIView):
 
     def get(self, request):
 
-        workflows = Workflow.objects.filter(owner = self.request.user) | Workflow.objects.filter(users__id__exact=self.request.user.id)
+        workflows = Workflow.objects.filter(owner = self.request.user).union(Workflow.objects.filter(users__id__exact=self.request.user.id))
         serializer = WorkflowSerializer(workflows, many=True)
         return Response({"workflows": serializer.data})
+
+
+
+class WorkflowUserRequestView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get_workflow(self, user, id):
+        try:
+            return Workflow.objects.get(id=id, users__id__exact=user.id)
+        except Workflow.DoesNotExist:
+            raise Http404
+
+    def get(self, request, worflow_id):
+        
+        workflow = self.get_workflow(request.user, workflow_id)
+        user_requests = WorkflowUserRequest.objects.filter(workflow=workflow)
+
+        serializer = WorkflowUserRequestSerializer(user_request, many=True)
+        return Response({"user_requests": serializer.data})
 
 
 @login_required

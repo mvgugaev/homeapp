@@ -16,3 +16,13 @@ class WorkflowSerializer(serializers.Serializer):
     class Meta:
         model = Workflow
         fields = ("id", "name", "created_at", "updated_at")
+
+
+
+class WorkflowUserRequestSerializer(serializers.Serializer):
+    workflow_id = serializers.CharField(required=False)
+    email = serializers.CharField(max_length=200)
+    accepted = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = WorkflowUserRequest

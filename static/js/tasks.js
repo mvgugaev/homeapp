@@ -29,7 +29,7 @@ TASKS = {
     create: {
         form_instance: undefined,
         form_error_block: undefined,
-        required_fields: ['name', 'description', 'mode', 'workflow_id', 'last_date', 'cycle'],
+        required_fields: ['name', 'description', 'mode', 'workflow_id', 'last_date', 'cycle', 'use_retry_fail_executor'],
         block_form: function() {
             this.form_instance.find('button[type="submit"]').html(TASKS.render_dot_loading());
             this.form_instance.css({'pointer-events': 'none'});
@@ -351,7 +351,7 @@ TASKS = {
                     <div class="card-body">
                         <div class="card-title">
                             <a href="#">
-                                <h6 data-filter-by="text" class="H6-filter-by-text">${data.name}</h6>
+                                <h6 data-filter-by="text" class="H6-filter-by-text">${data.name} ${data.mode == '2' || data.mode == '4' ? `<span style="color: #dee2e6;">${data.cycle} д</span>`: ``}</h6>
                             </a>
                             <span class="text-small">${task_type_text[data.mode]}</span>
                         </div>

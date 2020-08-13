@@ -25,6 +25,7 @@ class TaskSerializer(serializers.Serializer):
     mode = serializers.CharField()
     delay = serializers.IntegerField(required=False)
     cycle = serializers.IntegerField(required=False)
+    use_retry_fail_executor = serializers.BooleanField(required=False)
     description = serializers.CharField()
 
     workflow_id = serializers.CharField(required=False)

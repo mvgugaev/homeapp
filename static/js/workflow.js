@@ -24,12 +24,21 @@ WORKFLOW = {
             let list_content = '';
 
             data.forEach(function(element) {
+                
+                let user_list = '';
+
+                element.users.forEach(function(user) {
+                    user_list += `
+                        <li>
+                            <a href="#" data-toggle="tooltip" title="" data-original-title="${user.email}">
+                              <img alt="${user.username}" class="avatar" src="${user.avatar_url}">
+                            </a>
+                        </li>
+                        `;
+                });
+
                 list_content += `
                     <div class="card card-task">
-                        <div class="progress">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                            </div>
-                        </div>
                         <div class="card-body">
                             <div class="card-title">
                                 <a href="/workflows/${element.id}">
@@ -37,6 +46,9 @@ WORKFLOW = {
                                 </a>
                                 <span class="text-small">${element.created_at}</span>
                             </div>
+                            <ul class="avatars">
+                                ${user_list}
+                            </ul>
                         </div>
                     </div>
                 `;
