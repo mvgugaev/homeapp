@@ -36,7 +36,7 @@ class WorkflowUserRequestView(APIView):
         workflow = self.get_workflow(request.user, workflow_id)
         user_requests = WorkflowUserRequest.objects.filter(workflow=workflow)
 
-        serializer = WorkflowUserRequestSerializer(user_request, many=True)
+        serializer = WorkflowUserRequestSerializer(user_requests, many=True)
         return Response({"user_requests": serializer.data})
 
 

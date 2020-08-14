@@ -16,7 +16,18 @@ class TaskWorkflowSerializer(serializers.Serializer):
 
     class Meta:
         model = Workflow
-        fields = ("id", "name")  
+        fields = ("id", "name")
+
+
+class TaskChangeHistorySerializer(serializers.Serializer):
+    user = UserSerializer()
+    description = serializers.CharField()
+    type = serializers.CharField()
+    created_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, read_only=True)
+
+    class Meta:
+        model = Workflow
+
 
 class TaskSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -35,8 +46,8 @@ class TaskSerializer(serializers.Serializer):
 
     last_date = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], required=False)
     change_order_date = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], required=False)
-    created_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], read_only=True)
-    updated_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, input_formats=[BASE_DATETIME_FORMAT], read_only=True)
+    created_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, read_only=True)
+    updated_at = serializers.DateTimeField(format=BASE_DATETIME_FORMAT, read_only=True)
 
     compleated = serializers.BooleanField(read_only=True)
     closed = serializers.BooleanField(read_only=True)

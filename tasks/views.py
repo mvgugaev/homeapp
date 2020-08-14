@@ -103,6 +103,13 @@ class TaskView(APIView):
                 task_saved.set_executor_by_order()
                 task_saved.save()
 
+                history = TaskChangeHistory(
+                    type='0', 
+                    task=task_saved, 
+                    user=request.user)
+
+                history.save()
+
             return Response({"success": "Task '{}' created successfully".format(task_saved.name)})
         
         elif method_type == 'exec':
@@ -114,6 +121,13 @@ class TaskView(APIView):
 
             task = self.get_task(request.user, task_id)
             task.exec_task()
+
+            history = TaskChangeHistory(
+                type='2', 
+                task=task_saved, 
+                user=request.user)
+
+            history.save()
 
             return Response({"success": "Task '{}' compleated successfully".format(task.name)})
 
@@ -130,6 +144,14 @@ class TaskView(APIView):
             
             task = self.get_task(request.user, task_id)
             task.change_task_status(status)
+            
+            description = 'Задача закрыта' if status else 'Задача открыта'
+            history = TaskChangeHistory(
+                type='1', 
+                task=task_saved, 
+                user=request.user,
+                description=description
+            )
 
             return Response({"success": "Task '{}' changed successfully".format(task.name)})
 
@@ -144,3 +166,30 @@ class TaskView(APIView):
             task.delete()
 
             return Response({"success": "Task deleted successfully"})
+
+
+
+
+class TaskChangeHistoryView(APIView):
+
+    serializer_class = TaskChangeHistorySerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_task(self, user, id):
+        try:
+            task = Task.objects.get(id=id)
+
+            if task.workflow.owner != user and user not in task.workflow.users.all():
+                raise Http404
+
+            return task
+        except Task.DoesNotExist:
+            raise Http404
+
+    def get(self, request):
+
+        task = self.get_task(self.request.user, task_id)
+        history = TaskChangeHistory.objects.filter(task=task)
+        
+        serializer = self.serializer_class(tasks, many=True)
+        return Response({"history": serializer.data})
